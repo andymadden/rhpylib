@@ -8,6 +8,7 @@ import sqlite3
 
 class RHConnection:
     def __init__(self, token=None, un=None, pw=None, mfa=None, user_agent=None, log_location=None):
+        self.log_db = False
         if log_location:
             self.log_db = sqlite3.connect('logs.sqlite3')
             self.log_cursor = self.log_db.cursor()
@@ -156,13 +157,14 @@ class RHConnection:
         resp_headers = resp.info()
         resp_body = gzip.decompress(resp.read()).decode('utf-8')
 
-        self.log_cursor.execute("""
-            INSERT INTO ConnectionLog
-                (timestamp, url, request_headers, request_body, response_headers, response_body)
-            VALUES
-                (?, ?, ?, ?, ?, ?);
-        """, (datetime.now(), req.get_full_url(), json.dumps(req.headers), str(req.data), str(resp_headers), str(resp_body)))
-        self.log_db.commit()
+        if self.log_db:
+            self.log_cursor.execute("""
+                INSERT INTO ConnectionLog
+                    (timestamp, url, request_headers, request_body, response_headers, response_body)
+                VALUES
+                    (?, ?, ?, ?, ?, ?);
+            """, (datetime.now(), req.get_full_url(), json.dumps(req.headers), str(req.data), str(resp_headers), str(resp_body)))
+            self.log_db.commit()
 
         return json.loads(resp_body)
 
