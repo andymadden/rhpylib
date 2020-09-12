@@ -88,3 +88,17 @@ status = conn.get_order(order_id)['state']
 
 # If status is "filled", that means your order completed!
 ```
+
+### Finding guids for stocks/crypto
+
+You can use the query_market method to search for different stocks or cryptocurrencies.
+
+To search for stocks:
+```py
+stocks = conn.query_market('AMD')['instruments']
+```
+
+To search for crypto:
+```py
+crypto = conn.query_market("ETC")['currency_pairs']
+```
