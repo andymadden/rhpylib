@@ -6,7 +6,7 @@ Author: Andrew Madden \<andrewsmadden@gmail.com>
 RHPyLib is a very basic module for connecting to the Robinhood Web API. This allows developers to progamatically make calls to Robinhood's services.
 
 ## Limitations
-Currently the library does not support creating limit orders and cannot pull a user's holdings. I would like to alleviate this in future versions.
+Currently the library does not support creating market orders and cannot pull a user's holdings. I would like to alleviate this in future versions.
 
 I would also like to add some sort of indexing/search feature in order to look for a stock without knowing its guid representation.
 
