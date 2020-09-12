@@ -341,3 +341,36 @@ class RHConnection:
             self.log_db.commit()
 
         return json.loads(resp_body)
+    
+    def query_market(self, query):
+            host = "api.robinhood.com"
+            filename = "/midlands/search/?query="+query+"&origin=US"
+
+            req = Request('https://'+host+filename, headers={
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Authorization': self.token,
+                'Connection': 'keep-alive',
+                'Host': host,
+                'Origin': 'https://robinhood.com',
+                'Referer': 'https://robinhood.com',
+                'TE': 'Trailers',
+                'User-Agent': self.user_agent,
+                'X-TimeZone-Id': 'America/Chicago'
+            })
+
+            resp = urlopen(req)
+            resp_headers = resp.info()
+            resp_body = resp.read().decode('utf-8')
+
+            if self.log_db:
+                self.log_cursor.execute("""
+                    INSERT INTO ConnectionLog
+                        (timestamp, url, request_headers, request_body, response_headers, response_body)
+                    VALUES
+                        (?, ?, ?, ?, ?, ?);
+                """, (datetime.now(), req.get_full_url(), json.dumps(req.headers), str(req.data), str(resp_headers), str(resp_body)))
+                self.log_db.commit()
+
+            return json.loads(resp_body)
