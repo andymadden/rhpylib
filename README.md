@@ -3,10 +3,10 @@
 Author: Andrew Madden \<andrewsmadden@gmail.com>
 
 ## Overview
-RHPyLib is a very basic module for connecting to the Robinhood Web API. This allows developers to progamatically make calls to Robinhood's services.
+RHPyLib is a very basic module for connecting to the Robinhood Web API for cryptocurrency trading. This allows developers to progamatically make calls to Robinhood's services.
 
 ## Limitations
-Currently the library does not support creating market orders and cannot pull a user's holdings. I would like to alleviate this in future versions.
+Currently the library only supports cryptocurrency, does not support creating market orders, and cannot pull a user's holdings. I would like to alleviate this in future versions.
 
 I would also like to add some sort of indexing/search feature in order to look for a stock without knowing its guid representation.
 
@@ -30,7 +30,7 @@ conn = RHConnection(token="Bearer <long_token_string>")
 or like this:
 
 ```py
-conn = RHConnection(un="<username>", pw="<password>", mfa="<token>")
+conn = RHConnection(un="<username>", pw="<password>", mfa="<mfa token from otp authentication app/tool>")
 ```
 
 ### Getting Quotes
@@ -39,7 +39,7 @@ You can get an up to date quote for a stock or cryptocurrency using get_quote an
 
 ```py
 # Get a quote for the current price of DOGE. guid='1ef78e1b-049b-4f12-90e5-555dcf2fe204'
-quote = conn.get_quote('1ef78e1b-049b-4f12-90e5-555dcf2fe204')
+quote = conn.get_quote_crypto('1ef78e1b-049b-4f12-90e5-555dcf2fe204')
 
 # quote = {
 #   "ask_price": <float>,
@@ -71,16 +71,16 @@ data = conn.get_historical_data("7b577ce3-489d-4269-9408-796a0d1abb3a", '24_7', 
 You can create limit buy orders:
 ```py
 # Create limit buy for 200 ETC with a limit of $7.50
-order = conn.make_limit_buy("7b577ce3-489d-4269-9408-796a0d1abb3a", 7.5, 200)
+order = conn.make_limit_buy_crypto("7b577ce3-489d-4269-9408-796a0d1abb3a", 7.5, 200)
 ```
 You can create limit sell orders:
 ```py
 # Create limit sell for 200 ETC with a limit of $7.50
-order = conn.make_limit_sell("7b577ce3-489d-4269-9408-796a0d1abb3a", 7.5, 200)
+order = conn.make_limit_sell_crypto("7b577ce3-489d-4269-9408-796a0d1abb3a", 7.5, 200)
 ```
 You can check your the status of your order after you've placed it:
 ```py
-order_id = conn.make_limit_sell("7b577ce3-489d-4269-9408-796a0d1abb3a", 7.5, 200)['id']
+order_id = conn.make_limit_sell_crypto("7b577ce3-489d-4269-9408-796a0d1abb3a", 7.5, 200)['id']
 
 # Wait some amount of time, unless you're lucky
 
@@ -91,7 +91,7 @@ status = conn.get_order(order_id)['state']
 
 ### Finding guids for stocks/crypto
 
-You can use the query_market method to search for different stocks or cryptocurrencies.
+You can use the query_market method to search for different stocks or cryptocurrencies. Each search returns a dictionary object with keys of "instruments", "currency_pairs", 
 
 To search for stocks:
 ```py

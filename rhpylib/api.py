@@ -100,7 +100,7 @@ class RHConnection:
 
         return json.loads(resp_body)
     
-    def get_historical_data(self, guid, bounds, interval, span):
+    def get_historical_data_crypto(self, guid, bounds, interval, span):
         host = "api.robinhood.com"
         filename = "/marketdata/forex/historicals/"+ guid +"/"
         # bounds=24_7, interval=hour, span=week
@@ -135,7 +135,7 @@ class RHConnection:
 
         return json.loads(resp_body)
 
-    def get_quote(self, guid):
+    def get_quote_crypto(self, guid):
         host = "api.robinhood.com"
         filename = "/marketdata/forex/quotes/"+guid+"/"
 
@@ -168,7 +168,7 @@ class RHConnection:
 
         return json.loads(resp_body)
 
-    def make_limit_sell(self, guid, price, quantity):
+    def make_limit_sell_crypto(self, guid, price, quantity):
         host = "nummus.robinhood.com"
         filename = "/orders/"
 
@@ -204,7 +204,7 @@ class RHConnection:
 
         return json.loads(resp_body)
     
-    def make_limit_buy(self, guid, price, quantity):
+    def make_limit_buy_crypto(self, guid, price, quantity):
         host = "nummus.robinhood.com"
         filename = "/orders/"
 
