@@ -105,6 +105,7 @@ class RHConnection:
         filename = "/marketdata/forex/historicals/"+ guid +"/"
         # bounds=24_7, interval=hour, span=week
         # bounds=24_7, interval=15second, span=hour
+        # bounds=24_7, interval=5minute, span=day
         query = "?bounds="+bounds+"&interval="+interval+"&span="+span
 
         req = Request('https://'+host+filename+query, headers={
@@ -343,34 +344,136 @@ class RHConnection:
         return json.loads(resp_body)
     
     def query_market(self, query):
-            host = "api.robinhood.com"
-            filename = "/midlands/search/?query="+query+"&origin=US"
+        host = "api.robinhood.com"
+        filename = "/midlands/search/?query="+query+"&origin=US"
 
-            req = Request('https://'+host+filename, headers={
-                'Accept': '*/*',
-                'Accept-Encoding': 'gzip, deflate, br',
-                'Accept-Language': 'en-US,en;q=0.5',
-                'Authorization': self.token,
-                'Connection': 'keep-alive',
-                'Host': host,
-                'Origin': 'https://robinhood.com',
-                'Referer': 'https://robinhood.com',
-                'TE': 'Trailers',
-                'User-Agent': self.user_agent,
-                'X-TimeZone-Id': 'America/Chicago'
-            })
+        req = Request('https://'+host+filename, headers={
+            'Accept': '*/*',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Authorization': self.token,
+            'Connection': 'keep-alive',
+            'Host': host,
+            'Origin': 'https://robinhood.com',
+            'Referer': 'https://robinhood.com',
+            'TE': 'Trailers',
+            'User-Agent': self.user_agent,
+            'X-TimeZone-Id': 'America/Chicago'
+        })
 
-            resp = urlopen(req)
-            resp_headers = resp.info()
-            resp_body = resp.read().decode('utf-8')
+        resp = urlopen(req)
+        resp_headers = resp.info()
+        resp_body = resp.read().decode('utf-8')
 
-            if self.log_db:
-                self.log_cursor.execute("""
-                    INSERT INTO ConnectionLog
-                        (timestamp, url, request_headers, request_body, response_headers, response_body)
-                    VALUES
-                        (?, ?, ?, ?, ?, ?);
-                """, (datetime.now(), req.get_full_url(), json.dumps(req.headers), str(req.data), str(resp_headers), str(resp_body)))
-                self.log_db.commit()
+        if self.log_db:
+            self.log_cursor.execute("""
+                INSERT INTO ConnectionLog
+                    (timestamp, url, request_headers, request_body, response_headers, response_body)
+                VALUES
+                    (?, ?, ?, ?, ?, ?);
+            """, (datetime.now(), req.get_full_url(), json.dumps(req.headers), str(req.data), str(resp_headers), str(resp_body)))
+            self.log_db.commit()
 
-            return json.loads(resp_body)
+        return json.loads(resp_body)
+    
+    def get_options_instruments(self, chain_id, expiration_date, type):
+        host = "api.robinhood.com"
+        filename = "/options/instruments/"
+
+        req = Request('https://'+host+filename+"?chain_id="+chain_id+"&expiration_date="+expiration_date+"&state=active&type="+type, headers={
+            'Accept': '*/*',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Content-Type': 'application/json',
+            'Authorization': self.token,
+            'Connection': 'keep-alive',
+            'Host': host,
+            'Origin': 'https://robinhood.com',
+            'Referer': 'https://robinhood.com',
+            'TE': 'Trailers',
+            'User-Agent': self.user_agent,
+            'X-TimeZone-Id': 'America/Chicago'
+        })
+
+        resp = urlopen(req)
+        resp_headers = str(resp.getheaders())
+        resp_body = resp.read().decode('utf-8')
+
+        if self.log_db:
+            self.log_cursor.execute("""
+                INSERT INTO ConnectionLog
+                    (timestamp, url, request_headers, request_body, response_headers, response_body)
+                VALUES
+                    (?, ?, ?, ?, ?, ?);
+            """, (datetime.now(), req.get_full_url(), json.dumps(req.headers), str(req.data), resp_headers, resp_body))
+            self.log_db.commit()
+
+        return json.loads(resp_body)
+    
+    def get_options_instrument_data(self, instruments):
+        host = "api.robinhood.com"
+        filename = "/marketdata/options/"
+
+        req = Request('https://'+host+filename+"?instruments="+",".join(instruments), headers={
+            'Accept': '*/*',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Content-Type': 'application/json',
+            'Authorization': self.token,
+            'Connection': 'keep-alive',
+            'Host': host,
+            'Origin': 'https://robinhood.com',
+            'Referer': 'https://robinhood.com',
+            'TE': 'Trailers',
+            'User-Agent': self.user_agent,
+            'X-TimeZone-Id': 'America/Chicago'
+        })
+
+        resp = urlopen(req)
+        resp_headers = str(resp.getheaders())
+        resp_body = resp.read().decode('utf-8')
+
+        if self.log_db:
+            self.log_cursor.execute("""
+                INSERT INTO ConnectionLog
+                    (timestamp, url, request_headers, request_body, response_headers, response_body)
+                VALUES
+                    (?, ?, ?, ?, ?, ?);
+            """, (datetime.now(), req.get_full_url(), json.dumps(req.headers), str(req.data), resp_headers, resp_body))
+            self.log_db.commit()
+
+        return json.loads(resp_body)
+
+    def get_options_chain(self, chains):
+        host = "api.robinhood.com"
+        filename = "/options/chains/"
+
+        req = Request('https://'+host+filename+"?ids="+",".join(chains), headers={
+            'Accept': '*/*',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Content-Type': 'application/json',
+            'Authorization': self.token,
+            'Connection': 'keep-alive',
+            'Host': host,
+            'Origin': 'https://robinhood.com',
+            'Referer': 'https://robinhood.com',
+            'TE': 'Trailers',
+            'User-Agent': self.user_agent,
+            'X-TimeZone-Id': 'America/Chicago'
+        })
+
+        resp = urlopen(req)
+        resp_headers = str(resp.getheaders())
+        resp_body = resp.read().decode('utf-8')
+
+        if self.log_db:
+            self.log_cursor.execute("""
+                INSERT INTO ConnectionLog
+                    (timestamp, url, request_headers, request_body, response_headers, response_body)
+                VALUES
+                    (?, ?, ?, ?, ?, ?);
+            """, (datetime.now(), req.get_full_url(), json.dumps(req.headers), str(req.data), resp_headers, resp_body))
+            self.log_db.commit()
+
+        return json.loads(resp_body)
